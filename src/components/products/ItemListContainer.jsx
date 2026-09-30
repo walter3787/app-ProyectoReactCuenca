@@ -7,15 +7,31 @@ export function ItemListContainer({ saludo }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('/data/productos.json')
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('No se pudo cargar el catálogo de productos');
-        }
+    // Consultamos ambas categorías en paralelo
+    Promise.all([
+      fetch('https://fakestoreapi.com/products/category/electronics').then((res) => {
+        if (!res.ok) throw new Error('Error al cargar electrónica');
         return res.json();
-      })
-      .then((data) => {
-        setProductos(data);
+      }),
+      fetch("https://fakestoreapi.com/products/category/men's clothing").then((res) => {
+        if (!res.ok) throw new Error('Error al cargar accesorios');
+        return res.json();
+      }),
+    ])
+      .then(([electronica, accesorios]) => {
+        // Tomamos los 6 de electrónica y 2 adicionales de la otra categoría
+        const combinados = [...electronica, ...accesorios.slice(0, 2)];
+
+        const productosFormateados = combinados.map((item) => ({
+          id: item.id,
+          nombre: item.title,
+          precio: Math.round(item.price * 1000),
+          stock: item.rating ? item.rating.count : 10,
+          descripcion: item.description,
+          imagen: item.image,
+        }));
+
+        setProductos(productosFormateados);
       })
       .catch((err) => {
         setError(err.message);
@@ -28,7 +44,7 @@ export function ItemListContainer({ saludo }) {
   if (cargando) {
     return (
       <div style={{ textAlign: 'center', padding: '3rem', color: '#0f766e' }}>
-        <h2>Cargando catálogo... ⏳</h2>
+        <h2>Cargando catálogo completo (8 productos)... ⏳</h2>
       </div>
     );
   }
@@ -36,7 +52,7 @@ export function ItemListContainer({ saludo }) {
   if (error) {
     return (
       <div style={{ textAlign: 'center', padding: '3rem', color: '#e11d48' }}>
-        <h2>Ups, ocurrió un error:</h2>
+        <h2>Error al obtener productos:</h2>
         <p>{error}</p>
       </div>
     );
@@ -45,7 +61,7 @@ export function ItemListContainer({ saludo }) {
   return (
     <section>
       {saludo && (
-        <h2 style={{ color: '#0f172a', marginBottom: '0.5rem', fontSize: '1.75rem' }}>
+        <h2 style={{ color: '#0f172a', marginBottom: '1rem', fontSize: '1.75rem' }}>
           {saludo}
         </h2>
       )}
