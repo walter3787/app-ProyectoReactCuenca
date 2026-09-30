@@ -7,19 +7,18 @@ export function ItemListContainer({ saludo }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Consultamos ambas categorías en paralelo
+    // Usamos %27 para evitar conflictos con la comilla simple en producción
     Promise.all([
       fetch('https://fakestoreapi.com/products/category/electronics').then((res) => {
         if (!res.ok) throw new Error('Error al cargar electrónica');
         return res.json();
       }),
-      fetch("https://fakestoreapi.com/products/category/men's clothing").then((res) => {
+      fetch('https://fakestoreapi.com/products/category/men%27s%20clothing').then((res) => {
         if (!res.ok) throw new Error('Error al cargar accesorios');
         return res.json();
       }),
     ])
       .then(([electronica, accesorios]) => {
-        // Tomamos los 6 de electrónica y 2 adicionales de la otra categoría
         const combinados = [...electronica, ...accesorios.slice(0, 2)];
 
         const productosFormateados = combinados.map((item) => ({
