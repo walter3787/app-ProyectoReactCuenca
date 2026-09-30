@@ -4,6 +4,13 @@ Plataforma de comercio electrónico desarrollada con **React** y **Vite**, orien
 
 ---
 
+## 🌐 Demo en Vivo
+
+Podés ver la aplicación funcionando en producción en:
+👉 **[https://app-proyecto-react-cuenca.vercel.app](https://app-proyecto-react-cuenca.vercel.app)**
+
+---
+
 ## 🚀 Características y Requerimientos Implementados
 
 * **Estructura y Layout Modular:** 
@@ -31,6 +38,7 @@ Plataforma de comercio electrónico desarrollada con **React** y **Vite**, orien
 * **Fake Store API** (Catálogo de productos)
 * **CSS Modules & CSS3**
 * **JavaScript (ES6+)**
+* **Vercel** (Despliegue y hosting)
 
 ---
 
