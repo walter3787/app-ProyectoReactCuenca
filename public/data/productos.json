@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "nombre": "Notebook Pro 15",
+    "precio": 1250000,
+    "stock": 10,
+    "descripcion": "Procesador de alto rendimiento, 16GB RAM y SSD de 512GB.",
+    "imagen": "https://placehold.co/300x200?text=Notebook+Pro"
+  },
+  {
+    "id": 2,
+    "nombre": "Monitor Gamer 27",
+    "precio": 420000,
+    "stock": 8,
+    "descripcion": "Panel IPS 144Hz, resolución QHD y bordes ultra delgados.",
+    "imagen": "https://placehold.co/300x200?text=Monitor+27"
+  },
+  {
+    "id": 3,
+    "nombre": "Teclado Mecánico RGB",
+    "precio": 85000,
+    "stock": 25,
+    "descripcion": "Switches mecánicos red, retroiluminación RGB y cable mallado.",
+    "imagen": "https://placehold.co/300x200?text=Teclado+RGB"
+  },
+  {
+    "id": 4,
+    "nombre": "Mouse Inalámbrico Pro",
+    "precio": 45000,
+    "stock": 15,
+    "descripcion": "Sensor óptico de alta precisión con batería recargable.",
+    "imagen": "https://placehold.co/300x200?text=Mouse+Pro"
+  }
+]

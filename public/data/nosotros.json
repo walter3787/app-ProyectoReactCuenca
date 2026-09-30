@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "nombre": "Ana Pérez",
+    "rol": "Líder de Desarrollo",
+    "email": "ana.perez@empresa.com",
+    "foto": "https://placehold.co/100x100?text=Ana"
+  },
+  {
+    "id": 2,
+    "nombre": "Carlos Gómez",
+    "rol": "Diseñador UI/UX",
+    "email": "carlos.g@empresa.com",
+    "foto": "https://placehold.co/100x100?text=Carlos"
+  },
+  {
+    "id": 3,
+    "nombre": "Lucía Morales",
+    "rol": "Product Manager",
+    "email": "lucia.m@empresa.com",
+    "foto": "https://placehold.co/100x100?text=Lucia"
+  }
+]
