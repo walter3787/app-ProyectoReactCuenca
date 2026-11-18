@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
-import { collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc } from "firebase/firestore";
 import { db } from "../firebase/config";
 
 export default function Gestion() {
@@ -9,6 +9,7 @@ export default function Gestion() {
 
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [productoAEditar, setProductoAEditar] = useState(null);  
 
   const [formulario, setFormulario] = useState({
     nombre: "",
@@ -52,17 +53,31 @@ export default function Gestion() {
   const guardarProducto = async (e) => {
     e.preventDefault();
 
-    try {
-      await addDoc(collection(db, "productos"), {
-        nombre: formulario.nombre,
-        precio: Number(formulario.precio),
-        stock: Number(formulario.stock),
-        categoria: formulario.categoria,
-        descripcion: formulario.descripcion,
-        imagen: formulario.imagen,
-      });
+    const productoData = {
+      nombre: formulario.nombre,
+      precio: Number(formulario.precio),
+      stock: Number(formulario.stock),
+      categoria: formulario.categoria,
+      descripcion: formulario.descripcion,
+      imagen: formulario.imagen,
+    };
 
-      alert("Producto guardado correctamente");
+    try {
+      if (productoAEditar) {
+        await updateDoc(
+          doc(db, "productos", productoAEditar.id),
+          productoData
+        );
+
+        alert("Producto actualizado correctamente");
+      } else {
+        await addDoc(
+          collection(db, "productos"),
+          productoData
+        );
+
+        alert("Producto guardado correctamente");
+      }
 
       setFormulario({
         nombre: "",
@@ -73,7 +88,10 @@ export default function Gestion() {
         imagen: "",
       });
 
+      setProductoAEditar(null);
+
       obtenerProductos();
+
     } catch (error) {
       console.error(error);
       alert("Error al guardar producto");
@@ -97,6 +115,19 @@ export default function Gestion() {
       console.error(error);
       alert("Error al eliminar");
     }
+  };
+
+  const editarProducto = (producto) => {
+    setProductoAEditar(producto);
+
+    setFormulario({
+      nombre: producto.nombre || "",
+      precio: producto.precio || "",
+      stock: producto.stock || "",
+      categoria: producto.categoria || "",
+      descripcion: producto.descripcion || "",
+      imagen: producto.imagen || "",
+    });
   };
 
   return (
@@ -180,7 +211,9 @@ export default function Gestion() {
         <br /><br />
 
         <button type="submit">
-          Guardar Producto
+          {productoAEditar
+            ? "Actualizar Producto"
+            : "Guardar Producto"}
         </button>
       </form>
 
@@ -199,6 +232,13 @@ export default function Gestion() {
             ${producto.precio}
             {" - "}
             Stock: {producto.stock}
+
+            <button
+              onClick={() => editarProducto(producto)}
+              style={{ marginLeft: "1rem" }}
+            >
+              Editar
+            </button>
 
             <button
               onClick={() => eliminarProducto(producto.id)}
