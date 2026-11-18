@@ -6,6 +6,9 @@ import ProductoDetalle from './pages/ProductoDetalle';
 import Carrito from './pages/Carrito';
 import { ItemListContainer } from './components/products/ItemListContainer';
 import Login from './pages/Login';
+import Registro from './pages/Registro';
+import Gestion from './pages/Gestion';
+import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
   return (
@@ -30,6 +33,19 @@ export default function App() {
         {/* Vista de login */}
         <Route path="/login" element={<Login />} />
         
+        {/* Vista de registro */}
+        <Route path="/registro" element={<Registro />} />
+
+        {/* Vista de gestión protegida */}
+        <Route
+          path="/gestion"
+          element={
+            <ProtectedRoute>
+              <Gestion />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Ruta comodín por si escriben cualquier otra dirección */}
         <Route
           path="*"
