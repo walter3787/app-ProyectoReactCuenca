@@ -5,6 +5,7 @@ import Inicio from './pages/Inicio';
 import ProductoDetalle from './pages/ProductoDetalle';
 import Carrito from './pages/Carrito';
 import { ItemListContainer } from './components/products/ItemListContainer';
+import Login from './pages/Login';
 
 export default function App() {
   return (
@@ -26,6 +27,9 @@ export default function App() {
         {/* Vista requerida del carrito */}
         <Route path="/carrito" element={<Carrito />} />
 
+        {/* Vista de login */}
+        <Route path="/login" element={<Login />} />
+        
         {/* Ruta comodín por si escriben cualquier otra dirección */}
         <Route
           path="*"
