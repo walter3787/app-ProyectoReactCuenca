@@ -52,7 +52,13 @@ export default function Gestion() {
 
   const guardarProducto = async (e) => {
     e.preventDefault();
-
+    if (
+      formulario.nombre.trim() === "" ||
+      Number(formulario.precio) <= 0
+    ) {
+      alert("El nombre es obligatorio y el precio debe ser mayor a cero.");
+      return;
+    }
     const productoData = {
       nombre: formulario.nombre,
       precio: Number(formulario.precio),
@@ -215,6 +221,27 @@ export default function Gestion() {
             ? "Actualizar Producto"
             : "Guardar Producto"}
         </button>
+        
+        {productoAEditar && (
+        <button
+          type="button"
+          onClick={() => {
+            setProductoAEditar(null);
+
+            setFormulario({
+              nombre: "",
+              precio: "",
+              stock: "",
+              categoria: "",
+              descripcion: "",
+              imagen: "",
+            });
+          }}
+          style={{ marginLeft: "1rem" }}
+        >
+          Cancelar edición
+        </button>
+      )}
       </form>
 
       <hr />
