@@ -1,8 +1,18 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import styles from './Nav.module.css';
+import React from "react";
+import { Link } from "react-router-dom";
+
+import { useCart } from "../../context/CartContext";
+
+import styles from "./Nav.module.css";
 
 export default function Nav() {
+  const { cart } = useCart();
+
+  const cantidadItems = cart.reduce(
+    (total, item) => total + item.cantidad,
+    0
+  );
+
   return (
     <nav>
       <ul className={styles.navList}>
@@ -11,14 +21,16 @@ export default function Nav() {
             Inicio
           </Link>
         </li>
+
         <li>
           <Link to="/productos" className={styles.navLink}>
             Productos
           </Link>
         </li>
+
         <li>
           <Link to="/carrito" className={styles.cartLink}>
-            🛒 Carrito
+            🛒 Carrito ({cantidadItems})
           </Link>
         </li>
       </ul>

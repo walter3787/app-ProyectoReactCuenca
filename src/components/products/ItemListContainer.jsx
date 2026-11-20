@@ -8,7 +8,9 @@ export function ItemListContainer({ saludo }) {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
+
   const [busqueda, setBusqueda] = useState("");
+  const [paginaActual, setPaginaActual] = useState(1);
 
   useEffect(() => {
     const obtenerProductos = async () => {
@@ -39,9 +41,33 @@ export function ItemListContainer({ saludo }) {
       .includes(busqueda.toLowerCase())
   );
 
+  const productosPorPagina = 12;
+
+  const indiceUltimoProducto =
+    paginaActual * productosPorPagina;
+
+  const indicePrimerProducto =
+    indiceUltimoProducto - productosPorPagina;
+
+  const productosPaginados =
+    productosFiltrados.slice(
+      indicePrimerProducto,
+      indiceUltimoProducto
+    );
+
+  const totalPaginas = Math.ceil(
+    productosFiltrados.length /
+      productosPorPagina
+  );
+
   if (cargando) {
     return (
-      <div style={{ textAlign: "center", padding: "3rem" }}>
+      <div
+        style={{
+          textAlign: "center",
+          padding: "3rem",
+        }}
+      >
         <h2>Cargando catálogo... ⏳</h2>
       </div>
     );
@@ -49,7 +75,12 @@ export function ItemListContainer({ saludo }) {
 
   if (error) {
     return (
-      <div style={{ textAlign: "center", padding: "3rem" }}>
+      <div
+        style={{
+          textAlign: "center",
+          padding: "3rem",
+        }}
+      >
         <h2>Error al obtener productos</h2>
         <p>{error}</p>
       </div>
@@ -74,7 +105,10 @@ export function ItemListContainer({ saludo }) {
         type="text"
         placeholder="Buscar producto..."
         value={busqueda}
-        onChange={(e) => setBusqueda(e.target.value)}
+        onChange={(e) => {
+          setBusqueda(e.target.value);
+          setPaginaActual(1);
+        }}
         style={{
           padding: "0.75rem",
           width: "100%",
@@ -85,7 +119,45 @@ export function ItemListContainer({ saludo }) {
         }}
       />
 
-      <ItemList productos={productosFiltrados} />
+      <ItemList productos={productosPaginados} />
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "0.5rem",
+          marginTop: "2rem",
+          flexWrap: "wrap",
+        }}
+      >
+        {Array.from(
+          { length: totalPaginas },
+          (_, index) => (
+            <button
+              key={index + 1}
+              onClick={() =>
+                setPaginaActual(index + 1)
+              }
+              style={{
+                padding: "0.5rem 1rem",
+                borderRadius: "6px",
+                border: "1px solid #ccc",
+                backgroundColor:
+                  paginaActual === index + 1
+                    ? "#0d9488"
+                    : "#fff",
+                color:
+                  paginaActual === index + 1
+                    ? "#fff"
+                    : "#000",
+                cursor: "pointer",
+              }}
+            >
+              {index + 1}
+            </button>
+          )
+        )}
+      </div>
     </section>
   );
 }
