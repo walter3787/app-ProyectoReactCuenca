@@ -1,8 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useCart } from "../../context/CartContext";
 import styles from './Item.module.css';
 
+
+
 export function Item({ id, nombre, precio, stock, imagen }) {
+  const { addToCart } = useCart();
   return (
     <article className={styles.card}>
       <img src={imagen} alt={nombre} className={styles.image} />
@@ -14,6 +18,19 @@ export function Item({ id, nombre, precio, stock, imagen }) {
         <Link to={`/producto/${id}`} className={styles.detailBtn}>
           Ver Detalle
         </Link>
+        <button
+          onClick={() =>
+            addToCart({
+              id,
+              nombre,
+              precio,
+              stock,
+              imagen,
+            })
+          }
+        >
+          Agregar al carrito
+        </button>
       </div>
     </article>
   );

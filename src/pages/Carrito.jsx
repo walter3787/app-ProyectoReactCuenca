@@ -1,36 +1,113 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 
 export default function Carrito() {
-  const cardStyle = {
-    backgroundColor: '#ffffff',
-    padding: '3rem 2rem',
-    borderRadius: '12px',
-    border: '1px solid #e2e8f0',
-    textAlign: 'center',
-    maxWidth: '600px',
-    margin: '2rem auto',
-    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
-  };
+  const {
+    cart,
+    removeFromCart,
+    increaseQuantity,
+    decreaseQuantity,
+    clearCart,
+  } = useCart();
 
-  return (
-    <div style={cardStyle}>
-      <h2 style={{ color: '#0f172a', marginBottom: '1rem', fontSize: '2rem' }}>🛒 Tu Carrito de Compras</h2>
-      <p style={{ color: '#64748b', marginBottom: '2rem' }}>
-        Por el momento el carrito se encuentra vacío. En la entrega final vas a poder sumar y gestionar tus productos con Context API.
-      </p>
-      <Link
-        to="/productos"
+  const total = cart.reduce(
+    (acc, item) => acc + item.precio * item.cantidad,
+    0
+  );
+
+  if (cart.length === 0) {
+    return (
+      <div
         style={{
-          backgroundColor: '#0d9488',
-          color: '#ffffff',
-          padding: '0.75rem 1.5rem',
-          borderRadius: '6px',
-          fontWeight: '600',
+          backgroundColor: "#ffffff",
+          padding: "3rem 2rem",
+          borderRadius: "12px",
+          border: "1px solid #e2e8f0",
+          textAlign: "center",
+          maxWidth: "600px",
+          margin: "2rem auto",
+          boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)",
         }}
       >
-        Explorar Productos
-      </Link>
+        <h2>🛒 Tu Carrito de Compras</h2>
+
+        <p>
+          No hay productos en el carrito.
+        </p>
+
+        <Link to="/productos">
+          Explorar Productos
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        maxWidth: "900px",
+        margin: "2rem auto",
+        padding: "1rem",
+      }}
+    >
+      <h1>🛒 Carrito</h1>
+
+      {cart.map((producto) => (
+        <div
+          key={producto.id}
+          style={{
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            padding: "1rem",
+            marginBottom: "1rem",
+          }}
+        >
+          <h3>{producto.nombre}</h3>
+
+          <p>
+            Precio: ${producto.precio.toLocaleString("es-AR")}
+          </p>
+
+          <p>
+            Cantidad: {producto.cantidad}
+          </p>
+
+          <button
+            onClick={() =>
+              decreaseQuantity(producto.id)
+            }
+          >
+            -
+          </button>
+
+          <button
+            onClick={() =>
+              increaseQuantity(producto.id)
+            }
+            style={{ marginLeft: "0.5rem" }}
+          >
+            +
+          </button>
+
+          <button
+            onClick={() =>
+              removeFromCart(producto.id)
+            }
+            style={{ marginLeft: "0.5rem" }}
+          >
+            Eliminar
+          </button>
+        </div>
+      ))}
+
+      <h2>
+        Total: ${total.toLocaleString("es-AR")}
+      </h2>
+
+      <button onClick={clearCart}>
+        Vaciar carrito
+      </button>
     </div>
   );
 }
