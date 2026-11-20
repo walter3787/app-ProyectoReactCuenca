@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Registro from './pages/Registro';
 import Gestion from './pages/Gestion';
 import ProtectedRoute from './components/ProtectedRoute';
+import CargaProductos from "./pages/CargaProductos";
 
 export default function App() {
   return (
@@ -44,6 +45,12 @@ export default function App() {
               <Gestion />
             </ProtectedRoute>
           }
+        />
+        
+        {/* Vista de carga de productos protegida */}
+        <Route
+          path="/carga-productos"
+          element={<CargaProductos />}
         />
 
         {/* Ruta comodín por si escriben cualquier otra dirección */}

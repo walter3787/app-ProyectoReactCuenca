@@ -1,57 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { ItemList } from './ItemList';
+import React, { useState, useEffect } from "react";
+import { collection, getDocs } from "firebase/firestore";
+
+import { db } from "../../firebase/config";
+import { ItemList } from "./ItemList";
 
 export function ItemListContainer({ saludo }) {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
+  const [busqueda, setBusqueda] = useState("");
 
   useEffect(() => {
-    // Usamos %27 para evitar conflictos con la comilla simple en producción
-    Promise.all([
-      fetch('https://fakestoreapi.com/products/category/electronics').then((res) => {
-        if (!res.ok) throw new Error('Error al cargar electrónica');
-        return res.json();
-      }),
-      fetch('https://fakestoreapi.com/products/category/men%27s%20clothing').then((res) => {
-        if (!res.ok) throw new Error('Error al cargar accesorios');
-        return res.json();
-      }),
-    ])
-      .then(([electronica, accesorios]) => {
-        const combinados = [...electronica, ...accesorios.slice(0, 2)];
+    const obtenerProductos = async () => {
+      try {
+        const productosRef = collection(db, "productos");
 
-        const productosFormateados = combinados.map((item) => ({
-          id: item.id,
-          nombre: item.title,
-          precio: Math.round(item.price * 1000),
-          stock: item.rating ? item.rating.count : 10,
-          descripcion: item.description,
-          imagen: item.image,
+        const respuesta = await getDocs(productosRef);
+
+        const productosFirestore = respuesta.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
         }));
 
-        setProductos(productosFormateados);
-      })
-      .catch((err) => {
+        setProductos(productosFirestore);
+      } catch (err) {
         setError(err.message);
-      })
-      .finally(() => {
+      } finally {
         setCargando(false);
-      });
+      }
+    };
+
+    obtenerProductos();
   }, []);
+
+  const productosFiltrados = productos.filter((producto) =>
+    producto.nombre
+      .toLowerCase()
+      .includes(busqueda.toLowerCase())
+  );
 
   if (cargando) {
     return (
-      <div style={{ textAlign: 'center', padding: '3rem', color: '#0f766e' }}>
-        <h2>Cargando catálogo completo (8 productos)... ⏳</h2>
+      <div style={{ textAlign: "center", padding: "3rem" }}>
+        <h2>Cargando catálogo... ⏳</h2>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={{ textAlign: 'center', padding: '3rem', color: '#e11d48' }}>
-        <h2>Error al obtener productos:</h2>
+      <div style={{ textAlign: "center", padding: "3rem" }}>
+        <h2>Error al obtener productos</h2>
         <p>{error}</p>
       </div>
     );
@@ -60,11 +59,33 @@ export function ItemListContainer({ saludo }) {
   return (
     <section>
       {saludo && (
-        <h2 style={{ color: '#0f172a', marginBottom: '1rem', fontSize: '1.75rem' }}>
+        <h2
+          style={{
+            color: "#0f172a",
+            marginBottom: "1rem",
+            fontSize: "1.75rem",
+          }}
+        >
           {saludo}
         </h2>
       )}
-      <ItemList productos={productos} />
+
+      <input
+        type="text"
+        placeholder="Buscar producto..."
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+        style={{
+          padding: "0.75rem",
+          width: "100%",
+          maxWidth: "400px",
+          marginBottom: "1rem",
+          borderRadius: "8px",
+          border: "1px solid #ccc",
+        }}
+      />
+
+      <ItemList productos={productosFiltrados} />
     </section>
   );
 }
