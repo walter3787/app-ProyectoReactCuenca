@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useCart } from "../../context/CartContext";
@@ -8,7 +8,7 @@ import styles from "./Nav.module.css";
 
 export default function Nav({ abrirCarrito }) {
   const { cart } = useCart();
-
+  const [menuOpen, setMenuOpen] = useState(false);
   const {
     user,
     rol,
@@ -28,98 +28,134 @@ export default function Nav({ abrirCarrito }) {
     }
   };
 
-  return (
-    <nav>
-      <ul className={styles.navList}>
+return (
+  <nav className={styles.nav}>
+    {menuOpen && (
+      <div
+        className={styles.overlay}
+        onClick={() => setMenuOpen(false)}
+      />
+    )}
+
+    <button
+      className={styles.menuButton}
+      onClick={() =>
+        setMenuOpen(!menuOpen)
+      }
+    >
+      ☰
+    </button>
+
+    <ul
+      className={`${styles.navList} ${
+        menuOpen
+          ? styles.open
+          : ""
+      }`}
+    >
+      <li>
+        <Link
+          to="/"
+          className={styles.navLink}
+          onClick={() =>
+            setMenuOpen(false)
+          }
+        >
+          Inicio
+        </Link>
+      </li>
+
+      <li>
+        <Link
+          to="/productos"
+          className={styles.navLink}
+          onClick={() =>
+            setMenuOpen(false)
+          }
+        >
+          Productos
+        </Link>
+      </li>
+
+      <li>
+        <button
+          onClick={() => {
+            abrirCarrito();
+            setMenuOpen(false);
+          }}
+          className={styles.cartLink}
+        >
+          🛒 Carrito ({cantidadItems})
+        </button>
+      </li>
+
+      {rol === "admin" && (
         <li>
           <Link
-            to="/"
+            to="/gestion"
             className={styles.navLink}
+            onClick={() =>
+              setMenuOpen(false)
+            }
           >
-            Inicio
+            Gestión
           </Link>
         </li>
+      )}
 
-        <li>
-          <Link
-            to="/productos"
-            className={styles.navLink}
+      {user ? (
+        <>
+          <li
+            className={
+              styles.userLabel
+            }
           >
-            Productos
-          </Link>
-        </li>
+            👤{" "}
+            {rol === "admin"
+              ? "Admin"
+              : "Usuario"}
+          </li>
 
-        <li>
-          <button
-            onClick={abrirCarrito}
-            className={styles.cartLink}
-          >
-            🛒 Carrito ({cantidadItems})
-          </button>
-        </li>
-
-        {rol === "admin" && (
+          <li>
+            <button
+              onClick={() => {
+                handleLogout();
+                setMenuOpen(false);
+              }}
+              className={
+                styles.logoutButton
+              }
+            >
+              Salir
+            </button>
+          </li>
+        </>
+      ) : (
+        <>
           <li>
             <Link
-              to="/gestion"
-              className={styles.navLink}
+              to="/login"
+              className={
+                styles.navLink
+              }
             >
-              Gestión
+              Login
             </Link>
           </li>
-        )}
 
-        {user ? (
-          <>
-            <li
-              style={{
-                color: "#ffffff",
-                display: "flex",
-                alignItems: "center",
-                fontWeight: "600",
-              }}
+          <li>
+            <Link
+              to="/registro"
+              className={
+                styles.navLink
+              }
             >
-              👤 {rol === "admin"
-                ? "Admin"
-                : "Usuario"}
-            </li>
-
-            <li>
-              <button
-                onClick={handleLogout}
-                className={styles.navLink}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                Salir
-              </button>
-            </li>
-          </>
-        ) : (
-          <>
-            <li>
-              <Link
-                to="/login"
-                className={styles.navLink}
-              >
-                Login
-              </Link>
-            </li>
-
-            <li>
-              <Link
-                to="/registro"
-                className={styles.navLink}
-              >
-                Registrarse
-              </Link>
-            </li>
-          </>
-        )}
-      </ul>
-    </nav>
-  );
+              Registrarse
+            </Link>
+          </li>
+        </>
+      )}
+    </ul>
+  </nav>
+);
 }

@@ -38,3 +38,81 @@
   background-color: #0f766e;
   transform: translateY(-1px);
 }
+
+.nav {
+  position: relative;
+}
+
+.menuButton {
+  display: none;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.userLabel {
+  color: white;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.logoutButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #f1f5f9;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.logoutButton:hover {
+  color: #2dd4bf;
+}
+
+@media (max-width: 768px) {
+  .menuButton {
+    display: block;
+  }
+
+  .navList {
+    display: none;
+  }
+
+  .navList.open {
+  display: flex;
+  flex-direction: column;
+
+  position: fixed;
+  top: 0;
+  right: 0;
+
+  width: 280px;
+  height: 100vh;
+
+  padding: 2rem 1.5rem;
+
+  background: #0b1634;
+
+  z-index: 9999;
+
+  box-shadow:
+    -6px 0 20px rgba(0,0,0,.35);
+}
+
+  .cartLink {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0,0,0,.45);
+
+  z-index: 9998;
+}
