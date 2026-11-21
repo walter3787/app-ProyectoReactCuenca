@@ -1,0 +1,320 @@
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.title {
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+}
+
+.userInfo {
+  color: #64748b;
+  margin-bottom: 2rem;
+}
+
+.formCard {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+
+.formCard h2 {
+  margin-bottom: 1rem;
+}
+
+.form {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.form input,
+.form textarea,
+.filters input,
+.filters select {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.form textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.formActions button {
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  background: #0d9488;
+  color: white;
+}
+
+.formActions button:hover {
+  background: #0f766e;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns:
+    2fr
+    1fr
+    1fr
+    1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 950px;
+}
+
+.table thead {
+  background: #0d9488;
+  color: white;
+}
+
+.table th,
+.table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.thumb {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.table button {
+  border: none;
+  padding: 0.55rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.table button:first-child {
+  background: #0d9488;
+  color: white;
+}
+
+.table button:first-child:hover {
+  background: #0f766e;
+}
+
+.table button:last-child {
+  background: #ef4444;
+  color: white;
+}
+
+.table button:last-child:hover {
+  background: #dc2626;
+}
+
+.stockOk {
+  background: #dcfce7;
+  color: #166534;
+  padding: 0.35rem 0.7rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.stockLow {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 0.35rem 0.7rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.stockCritical {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 0.35rem 0.7rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.65;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.pagination {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pagination button {
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #0d9488;
+  color: white;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-weight: 700;
+}
+
+@media (max-width: 992px) {
+  .filters {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .filters {
+    grid-template-columns: 1fr;
+  }
+
+  .formActions {
+    flex-direction: column;
+  }
+
+  .formActions button {
+    width: 100%;
+  }
+
+  .pagination {
+    flex-direction: column;
+  }
+
+  .pagination button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    text-align: center;
+  }
+
+  .userInfo {
+    text-align: center;
+  }
+}
+
+.stockSummary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stockCardGreen,
+.stockCardYellow,
+.stockCardRed,
+.stockCardBlue {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.stockCardGreen {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.stockCardYellow {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.stockCardRed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.stockCardBlue {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.stockCardGreen span,
+.stockCardYellow span,
+.stockCardRed span,
+.stockCardBlue span {
+  font-size: 2rem;
+}
+
+.stockCardGreen p,
+.stockCardYellow p,
+.stockCardRed p,
+.stockCardBlue p {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 992px) {
+  .stockSummary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .stockSummary {
+    grid-template-columns: 1fr;
+  }
+}

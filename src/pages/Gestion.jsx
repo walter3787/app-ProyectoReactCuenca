@@ -1,24 +1,53 @@
 import { useEffect, useState } from "react";
+
 import { useAuth } from "../context/AuthContext";
 
-import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
+
 import { db } from "../firebase/config";
 
+import styles from "./Gestion.module.css";
+
 export default function Gestion() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [productoAEditar, setProductoAEditar] = useState(null);  
 
-  const [formulario, setFormulario] = useState({
-    nombre: "",
-    precio: "",
-    stock: "",
-    categoria: "",
-    descripcion: "",
-    imagen: "",
-  });
+  const [productoAEditar, setProductoAEditar] =
+    useState(null);
+
+  const [busqueda, setBusqueda] =
+    useState("");
+
+  const [categoriaFiltro, setCategoriaFiltro] =
+    useState("Todas");
+
+  const [ordenarPor, setOrdenarPor] =
+    useState("nombreAsc");
+
+  const [paginaActual, setPaginaActual] =
+    useState(1);
+
+  const [productosPorPagina,
+    setProductosPorPagina] = useState(10);
+
+  const [formulario, setFormulario] =
+    useState({
+      nombre: "",
+      precio: "",
+      stock: "",
+      categoria: "",
+      descripcion: "",
+      imagen: "",
+    });
 
   useEffect(() => {
     obtenerProductos();
@@ -26,18 +55,21 @@ export default function Gestion() {
 
   const obtenerProductos = async () => {
     try {
-      const productosRef = collection(db, "productos");
+      const productosRef =
+        collection(db, "productos");
 
-      const respuesta = await getDocs(productosRef);
+      const respuesta =
+        await getDocs(productosRef);
 
-      const productosFirestore = respuesta.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const productosFirestore =
+        respuesta.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
       setProductos(productosFirestore);
     } catch (error) {
-      console.error("Error al obtener productos:", error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -46,236 +78,624 @@ export default function Gestion() {
   const manejarCambio = (e) => {
     setFormulario({
       ...formulario,
-      [e.target.name]: e.target.value,
+      [e.target.name]:
+        e.target.value,
     });
   };
+  const guardarProducto =
+    async (e) => {
+      e.preventDefault();
 
-  const guardarProducto = async (e) => {
-    e.preventDefault();
-    if (
-      formulario.nombre.trim() === "" ||
-      Number(formulario.precio) <= 0
-    ) {
-      alert("El nombre es obligatorio y el precio debe ser mayor a cero.");
-      return;
-    }
-    const productoData = {
-      nombre: formulario.nombre,
-      precio: Number(formulario.precio),
-      stock: Number(formulario.stock),
-      categoria: formulario.categoria,
-      descripcion: formulario.descripcion,
-      imagen: formulario.imagen,
-    };
-
-    try {
-      if (productoAEditar) {
-        await updateDoc(
-          doc(db, "productos", productoAEditar.id),
-          productoData
+      if (
+        formulario.nombre.trim() ===
+        "" ||
+        Number(formulario.precio) <=
+        0
+      ) {
+        alert(
+          "Nombre obligatorio y precio válido"
         );
-
-        alert("Producto actualizado correctamente");
-      } else {
-        await addDoc(
-          collection(db, "productos"),
-          productoData
-        );
-
-        alert("Producto guardado correctamente");
+        return;
       }
 
-      setFormulario({
-        nombre: "",
-        precio: "",
-        stock: "",
-        categoria: "",
-        descripcion: "",
-        imagen: "",
-      });
+      const productoData = {
+        nombre: formulario.nombre,
+        precio: Number(
+          formulario.precio
+        ),
+        stock: Number(
+          formulario.stock
+        ),
+        categoria:
+          formulario.categoria,
+        descripcion:
+          formulario.descripcion,
+        imagen:
+          formulario.imagen,
+      };
 
-      setProductoAEditar(null);
+      try {
+        if (productoAEditar) {
+          await updateDoc(
+            doc(
+              db,
+              "productos",
+              productoAEditar.id
+            ),
+            productoData
+          );
+        } else {
+          await addDoc(
+            collection(
+              db,
+              "productos"
+            ),
+            productoData
+          );
+        }
+
+        setFormulario({
+          nombre: "",
+          precio: "",
+          stock: "",
+          categoria: "",
+          descripcion: "",
+          imagen: "",
+        });
+
+        setProductoAEditar(null);
+
+        obtenerProductos();
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+  const eliminarProducto =
+    async (id) => {
+      const confirmar =
+        window.confirm(
+          "¿Eliminar producto?"
+        );
+
+      if (!confirmar) return;
+
+      await deleteDoc(
+        doc(db, "productos", id)
+      );
 
       obtenerProductos();
+    };
 
-    } catch (error) {
-      console.error(error);
-      alert("Error al guardar producto");
-    }
-  };
-
-  const eliminarProducto = async (id) => {
-  const confirmar = window.confirm(
-    "¿Seguro que deseas eliminar este producto?"
-  );
-
-  if (!confirmar) return;
-
-  try {
-    await deleteDoc(doc(db, "productos", id));
-
-    obtenerProductos();
-
-      alert("Producto eliminado");
-    } catch (error) {
-      console.error(error);
-      alert("Error al eliminar");
-    }
-  };
-
-  const editarProducto = (producto) => {
+  const editarProducto = (
+    producto
+  ) => {
     setProductoAEditar(producto);
 
     setFormulario({
-      nombre: producto.nombre || "",
-      precio: producto.precio || "",
-      stock: producto.stock || "",
-      categoria: producto.categoria || "",
-      descripcion: producto.descripcion || "",
-      imagen: producto.imagen || "",
+      nombre:
+        producto.nombre || "",
+      precio:
+        producto.precio || "",
+      stock:
+        producto.stock || "",
+      categoria:
+        producto.categoria || "",
+      descripcion:
+        producto.descripcion || "",
+      imagen:
+        producto.imagen || "",
     });
   };
+  let productosFiltrados =
+    productos.filter(
+      (producto) => {
+        const coincideBusqueda =
+          producto.nombre
+            ?.toLowerCase()
+            .includes(
+              busqueda.toLowerCase()
+            );
 
+        const coincideCategoria =
+          categoriaFiltro ===
+          "Todas" ||
+          producto.categoria ===
+          categoriaFiltro;
+
+        return (
+          coincideBusqueda &&
+          coincideCategoria
+        );
+      }
+    );
+
+  productosFiltrados.sort(
+    (a, b) => {
+      switch (ordenarPor) {
+        case "nombreAsc":
+          return a.nombre.localeCompare(
+            b.nombre
+          );
+
+        case "nombreDesc":
+          return b.nombre.localeCompare(
+            a.nombre
+          );
+
+        case "precioAsc":
+          return a.precio - b.precio;
+
+        case "precioDesc":
+          return b.precio - a.precio;
+
+        case "stockAsc":
+          return a.stock - b.stock;
+
+        case "stockDesc":
+          return b.stock - a.stock;
+
+        default:
+          return 0;
+      }
+    }
+  );
+
+  const categorias =
+    [
+      "Todas",
+      ...new Set(
+        productos.map(
+          (p) => p.categoria
+        )
+      ),
+    ];
+
+  const indiceFinal =
+    paginaActual *
+    productosPorPagina;
+
+  const indiceInicial =
+    indiceFinal -
+    productosPorPagina;
+
+  const productosPagina =
+    productosFiltrados.slice(
+      indiceInicial,
+      indiceFinal
+    );
+
+  const totalPaginas =
+    Math.ceil(
+      productosFiltrados.length /
+      productosPorPagina
+    );
+
+    const stockCritico = productos.filter(
+  (producto) => producto.stock <= 5
+).length;
+
+const stockBajo = productos.filter(
+  (producto) =>
+    producto.stock > 5 &&
+    producto.stock <= 10
+).length;
+
+const stockNormal = productos.filter(
+  (producto) => producto.stock > 10
+).length;
   return (
-    <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-      <h1>Panel de Gestión</h1>
+    <div className={styles.container}>
+      <h1 className={styles.title}>
+        Panel de Gestión
+      </h1>
 
-      <p>Usuario: {user?.email}</p>
+<div className={styles.stockSummary}>
+  <div className={styles.stockCardGreen}>
+    <span>🟢</span>
+    <div>
+      <strong>{stockNormal}</strong>
+      <p>Stock normal</p>
+    </div>
+  </div>
 
-      <button onClick={logout}>
-        Cerrar sesión
-      </button>
+  <div className={styles.stockCardYellow}>
+    <span>🟡</span>
+    <div>
+      <strong>{stockBajo}</strong>
+      <p>Stock bajo</p>
+    </div>
+  </div>
 
-      <hr />
+  <div className={styles.stockCardRed}>
+    <span>🔴</span>
+    <div>
+      <strong>{stockCritico}</strong>
+      <p>Stock crítico</p>
+    </div>
+  </div>
 
-      <h2>Alta de Producto</h2>
+  <div className={styles.stockCardBlue}>
+    <span>📦</span>
+    <div>
+      <strong>{productos.length}</strong>
+      <p>Total productos</p>
+    </div>
+  </div>
+</div>
 
-      <form onSubmit={guardarProducto}>
-        <input
-          type="text"
-          name="nombre"
-          placeholder="Nombre"
-          value={formulario.nombre}
-          onChange={manejarCambio}
-          required
-        />
-
-        <br /><br />
-
-        <input
-          type="number"
-          name="precio"
-          placeholder="Precio"
-          value={formulario.precio}
-          onChange={manejarCambio}
-          required
-        />
-
-        <br /><br />
-
-        <input
-          type="number"
-          name="stock"
-          placeholder="Stock"
-          value={formulario.stock}
-          onChange={manejarCambio}
-          required
-        />
-
-        <br /><br />
-
-        <input
-          type="text"
-          name="categoria"
-          placeholder="Categoría"
-          value={formulario.categoria}
-          onChange={manejarCambio}
-          required
-        />
-
-        <br /><br />
-
-        <textarea
-          name="descripcion"
-          placeholder="Descripción"
-          value={formulario.descripcion}
-          onChange={manejarCambio}
-          required
-        />
-
-        <br /><br />
-
-        <input
-          type="text"
-          name="imagen"
-          placeholder="URL de imagen"
-          value={formulario.imagen}
-          onChange={manejarCambio}
-          required
-        />
-
-        <br /><br />
-
-        <button type="submit">
+      <div className={styles.formCard}>
+        <h2>
           {productoAEditar
-            ? "Actualizar Producto"
-            : "Guardar Producto"}
-        </button>
-        
-        {productoAEditar && (
-        <button
-          type="button"
-          onClick={() => {
-            setProductoAEditar(null);
+            ? "Editar producto"
+            : "Alta de producto"}
+        </h2>
 
-            setFormulario({
-              nombre: "",
-              precio: "",
-              stock: "",
-              categoria: "",
-              descripcion: "",
-              imagen: "",
-            });
-          }}
-          style={{ marginLeft: "1rem" }}
+        <form
+          onSubmit={guardarProducto}
+          className={styles.form}
         >
-          Cancelar edición
-        </button>
-      )}
-      </form>
+          <input
+            type="text"
+            name="nombre"
+            placeholder="Nombre"
+            value={formulario.nombre}
+            onChange={manejarCambio}
+          />
 
-      <hr />
+          <input
+            type="number"
+            name="precio"
+            placeholder="Precio"
+            value={formulario.precio}
+            onChange={manejarCambio}
+          />
 
-      <h2>Productos</h2>
+          <input
+            type="number"
+            name="stock"
+            placeholder="Stock"
+            value={formulario.stock}
+            onChange={manejarCambio}
+          />
+
+          <input
+            type="text"
+            name="categoria"
+            placeholder="Categoría"
+            value={formulario.categoria}
+            onChange={manejarCambio}
+          />
+
+          <input
+            type="text"
+            name="imagen"
+            placeholder="URL imagen"
+            value={formulario.imagen}
+            onChange={manejarCambio}
+          />
+
+          <textarea
+            name="descripcion"
+            placeholder="Descripción"
+            value={formulario.descripcion}
+            onChange={manejarCambio}
+          />
+
+          <div
+            className={styles.formActions}
+          >
+            <button type="submit">
+              {productoAEditar
+                ? "Actualizar"
+                : "Guardar"}
+            </button>
+
+            {productoAEditar && (
+              <button
+                type="button"
+                onClick={() => {
+                  setProductoAEditar(
+                    null
+                  );
+
+                  setFormulario({
+                    nombre: "",
+                    precio: "",
+                    stock: "",
+                    categoria: "",
+                    descripcion: "",
+                    imagen: "",
+                  });
+                }}
+              >
+                Cancelar
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
+
+      <div className={styles.filters}>
+        <input
+          type="text"
+          placeholder="Buscar producto..."
+          value={busqueda}
+          onChange={(e) => {
+            setBusqueda(
+              e.target.value
+            );
+
+            setPaginaActual(1);
+          }}
+        />
+
+        <select
+          value={categoriaFiltro}
+          onChange={(e) => {
+            setCategoriaFiltro(
+              e.target.value
+            );
+
+            setPaginaActual(1);
+          }}
+        >
+          {categorias.map(
+            (categoria) => (
+              <option
+                key={categoria}
+                value={categoria}
+              >
+                {categoria}
+              </option>
+            )
+          )}
+        </select>
+
+        <select
+          value={ordenarPor}
+          onChange={(e) =>
+            setOrdenarPor(
+              e.target.value
+            )
+          }
+        >
+          <option value="nombreAsc">
+            Nombre A-Z
+          </option>
+
+          <option value="nombreDesc">
+            Nombre Z-A
+          </option>
+
+          <option value="precioAsc">
+            Precio ↑
+          </option>
+
+          <option value="precioDesc">
+            Precio ↓
+          </option>
+
+          <option value="stockAsc">
+            Stock ↑
+          </option>
+
+          <option value="stockDesc">
+            Stock ↓
+          </option>
+        </select>
+
+        <select
+          value={
+            productosPorPagina
+          }
+          onChange={(e) => {
+            setProductosPorPagina(
+              Number(
+                e.target.value
+              )
+            );
+
+            setPaginaActual(1);
+          }}
+        >
+          <option value="10">
+            10 por página
+          </option>
+
+          <option value="20">
+            20 por página
+          </option>
+
+          <option value="50">
+            50 por página
+          </option>
+
+          <option value="100">
+            100 por página
+          </option>
+        </select>
+      </div>
 
       {loading ? (
-        <p>Cargando productos...</p>
+        <p>Cargando...</p>
       ) : (
-        <ul>
-          {productos.map((producto) => (
-            <li key={producto.id}>
-            <strong>{producto.nombre}</strong>
-            {" - "}
-            ${producto.precio}
-            {" - "}
-            Stock: {producto.stock}
-
-            <button
-              onClick={() => editarProducto(producto)}
-              style={{ marginLeft: "1rem" }}
+        <>
+          <div
+            className={
+              styles.tableWrapper
+            }
+          >
+            <table
+              className={
+                styles.table
+              }
             >
-              Editar
+              <thead>
+                <tr>
+                  <th>Img</th>
+                  <th>Nombre</th>
+                  <th>Categoría</th>
+                  <th>Precio</th>
+                  <th>Stock</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {productosPagina.map(
+                  (
+                    producto
+                  ) => (
+                    <tr
+                      key={
+                        producto.id
+                      }
+                    >
+                      <td>
+                        <img
+                          src={
+                            producto.imagen
+                          }
+                          alt={
+                            producto.nombre
+                          }
+                          className={
+                            styles.thumb
+                          }
+                        />
+                      </td>
+
+                      <td>
+                        {
+                          producto.nombre
+                        }
+                      </td>
+
+                      <td>
+                        {
+                          producto.categoria
+                        }
+                      </td>
+
+                      <td>
+                        $
+                        {producto.precio.toLocaleString(
+                          "es-AR"
+                        )}
+                      </td>
+
+                      <td>
+                        {
+                          producto.stock
+                        }
+                      </td>
+
+                      <td>
+                        {producto.stock <=
+                          5 ? (
+                          <span
+                            className={
+                              styles.stockCritical
+                            }
+                          >
+                            Crítico
+                          </span>
+                        ) : producto.stock <=
+                          10 ? (
+                          <span
+                            className={
+                              styles.stockLow
+                            }
+                          >
+                            Bajo
+                          </span>
+                        ) : (
+                          <span
+                            className={
+                              styles.stockOk
+                            }
+                          >
+                            Normal
+                          </span>
+                        )}
+                      </td>
+
+                      <td>
+                        <button
+                          onClick={() =>
+                            editarProducto(
+                              producto
+                            )
+                          }
+                        >
+                          Editar
+                        </button>
+
+                        <button
+                          onClick={() =>
+                            eliminarProducto(
+                              producto.id
+                            )
+                          }
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div
+            className={
+              styles.pagination
+            }
+          >
+            <button
+              disabled={
+                paginaActual ===
+                1
+              }
+              onClick={() =>
+                setPaginaActual(
+                  (
+                    prev
+                  ) =>
+                    prev - 1
+                )
+              }
+            >
+              ← Anterior
             </button>
 
+            <span>
+              Página{" "}
+              {paginaActual} de{" "}
+              {totalPaginas}
+            </span>
+
             <button
-              onClick={() => eliminarProducto(producto.id)}
-              style={{ marginLeft: "1rem" }}
+              disabled={
+                paginaActual ===
+                totalPaginas
+              }
+              onClick={() =>
+                setPaginaActual(
+                  (
+                    prev
+                  ) =>
+                    prev + 1
+                )
+              }
             >
-              Eliminar
+              Siguiente →
             </button>
-          </li>
-          ))}
-        </ul>
+          </div>
+        </>
       )}
     </div>
   );
