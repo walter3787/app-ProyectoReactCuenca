@@ -1,0 +1,252 @@
+.container {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.title {
+  margin-bottom: 2rem;
+  color: #0f172a;
+  text-align: center;
+}
+
+/* Carrito vacío */
+
+.emptyCart {
+  background: #ffffff;
+  padding: 3rem 2rem;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+  max-width: 600px;
+  margin: 2rem auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.emptyText {
+  color: #64748b;
+  margin: 1rem 0 2rem;
+}
+
+.shopButton {
+  display: inline-block;
+  background: #0d9488;
+  color: white;
+  padding: 0.9rem 1.6rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.shopButton:hover {
+  background: #0f766e;
+}
+
+/* Tarjetas */
+
+.itemCard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  background: white;
+  padding: 1rem;
+  border-radius: 14px;
+  margin-bottom: 1rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.image {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
+.info {
+  flex: 1 1 250px;
+  min-width: 0;
+}
+
+.productTitle {
+  margin-bottom: 0.75rem;
+  color: #0f172a;
+}
+
+.info p {
+  margin: 0.35rem 0;
+  color: #475569;
+}
+
+/* Cantidades */
+
+.quantityControls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.quantityButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #0d9488;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quantityButton:hover {
+  background: #0f766e;
+  transform: scale(1.05);
+}
+
+.quantity {
+  min-width: 24px;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* Botón eliminar */
+
+.deleteButton {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  min-width: 120px;
+  transition: all 0.2s ease;
+}
+
+.deleteButton:hover {
+  background: #dc2626;
+}
+
+/* Resumen */
+
+.summary {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.total {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #0f172a;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.continueButton {
+  background: #0d9488;
+  color: white;
+  padding: 0.9rem 1.3rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.continueButton:hover {
+  background: #0f766e;
+}
+
+.clearButton {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.9rem 1.3rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.clearButton:hover {
+  background: #dc2626;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .itemCard {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .image {
+    width: 180px;
+    height: 180px;
+  }
+
+  .info {
+    width: 100%;
+  }
+
+  .quantityControls {
+    justify-content: center;
+  }
+
+  .deleteButton {
+    width: 100%;
+    max-width: 260px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .continueButton,
+  .clearButton {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .image {
+    width: 160px;
+    height: 160px;
+  }
+
+  .summary {
+    padding: 1rem;
+  }
+}
+
+.quantityButton:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}

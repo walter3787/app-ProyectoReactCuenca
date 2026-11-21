@@ -2,41 +2,31 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
+import styles from "./Carrito.module.css";
+
 export default function Carrito() {
   const {
     cart,
+    totalPrice,
     removeFromCart,
     increaseQuantity,
     decreaseQuantity,
     clearCart,
   } = useCart();
 
-  const total = cart.reduce(
-    (acc, item) => acc + item.precio * item.cantidad,
-    0
-  );
-
   if (cart.length === 0) {
     return (
-      <div
-        style={{
-          backgroundColor: "#ffffff",
-          padding: "3rem 2rem",
-          borderRadius: "12px",
-          border: "1px solid #e2e8f0",
-          textAlign: "center",
-          maxWidth: "600px",
-          margin: "2rem auto",
-          boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)",
-        }}
-      >
+      <div className={styles.emptyCart}>
         <h2>🛒 Tu Carrito de Compras</h2>
 
-        <p>
+        <p className={styles.emptyText}>
           No hay productos en el carrito.
         </p>
 
-        <Link to="/productos">
+        <Link
+          to="/productos"
+          className={styles.shopButton}
+        >
           Explorar Productos
         </Link>
       </div>
@@ -44,70 +34,152 @@ export default function Carrito() {
   }
 
   return (
-    <div
-      style={{
-        maxWidth: "900px",
-        margin: "2rem auto",
-        padding: "1rem",
-      }}
-    >
-      <h1>🛒 Carrito</h1>
+    <div className={styles.container}>
+      <h1 className={styles.title}>
+        🛒 Carrito de Compras
+      </h1>
 
       {cart.map((producto) => (
         <div
           key={producto.id}
-          style={{
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            padding: "1rem",
-            marginBottom: "1rem",
-          }}
+          className={styles.itemCard}
         >
-          <h3>{producto.nombre}</h3>
+          <img
+            src={producto.imagen}
+            alt={producto.nombre}
+            className={styles.image}
+          />
 
-          <p>
-            Precio: ${producto.precio.toLocaleString("es-AR")}
-          </p>
+          <div className={styles.info}>
+            <h3 className={styles.productTitle}>
+              {producto.nombre}
+            </h3>
 
-          <p>
-            Cantidad: {producto.cantidad}
-          </p>
+            <p>
+              Precio unitario:
+              {" "}
+              $
+              {producto.precio.toLocaleString(
+                "es-AR"
+              )}
+            </p>
+
+            <p>
+              Stock disponible:
+              {" "}
+              <strong>
+                {producto.stock}
+              </strong>
+            </p>
+
+            <p>
+              Subtotal:
+              {" "}
+              <strong>
+                $
+                {(
+                  producto.precio *
+                  producto.cantidad
+                ).toLocaleString(
+                  "es-AR"
+                )}
+              </strong>
+            </p>
+
+            <div
+              className={
+                styles.quantityControls
+              }
+            >
+              <button
+                className={
+                  styles.quantityButton
+                }
+                onClick={() =>
+                  decreaseQuantity(
+                    producto.id
+                  )
+                }
+              >
+                −
+              </button>
+
+              <span
+                className={
+                  styles.quantity
+                }
+              >
+                {producto.cantidad}
+              </span>
+
+              <button
+                className={
+                  styles.quantityButton
+                }
+                onClick={() =>
+                  increaseQuantity(
+                    producto.id
+                  )
+                }
+                disabled={
+                  producto.cantidad >=
+                  producto.stock
+                }
+                title={
+                  producto.cantidad >=
+                  producto.stock
+                    ? "Stock máximo alcanzado"
+                    : "Agregar unidad"
+                }
+              >
+                +
+              </button>
+            </div>
+          </div>
 
           <button
-            onClick={() =>
-              decreaseQuantity(producto.id)
+            className={
+              styles.deleteButton
             }
-          >
-            -
-          </button>
-
-          <button
             onClick={() =>
-              increaseQuantity(producto.id)
+              removeFromCart(
+                producto.id
+              )
             }
-            style={{ marginLeft: "0.5rem" }}
-          >
-            +
-          </button>
-
-          <button
-            onClick={() =>
-              removeFromCart(producto.id)
-            }
-            style={{ marginLeft: "0.5rem" }}
           >
             Eliminar
           </button>
         </div>
       ))}
 
-      <h2>
-        Total: ${total.toLocaleString("es-AR")}
-      </h2>
+      <div className={styles.summary}>
+        <h2 className={styles.total}>
+          Total: $
+          {totalPrice.toLocaleString(
+            "es-AR"
+          )}
+        </h2>
 
-      <button onClick={clearCart}>
-        Vaciar carrito
-      </button>
+        <div className={styles.actions}>
+          <Link
+            to="/productos"
+            className={
+              styles.continueButton
+            }
+          >
+            Seguir comprando
+          </Link>
+
+          <button
+            onClick={clearCart}
+            className={
+              styles.clearButton
+            }
+          >
+            Vaciar carrito
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
