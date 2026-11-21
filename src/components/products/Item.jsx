@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useCart } from "../../context/CartContext";
@@ -13,7 +13,8 @@ export function Item({
   imagen,
 }) {
   const { addToCart } = useCart();
-
+  const [agregado, setAgregado] =
+    useState(false);
   return (
     <article className={styles.card}>
       <img
@@ -47,18 +48,30 @@ export function Item({
 
         <button
           className={styles.cartBtn}
-          onClick={() =>
+          onClick={() => {
             addToCart({
               id,
               nombre,
               precio,
               stock,
               imagen,
-            })
-          }
+            });
+
+            setAgregado(true);
+
+            setTimeout(() => {
+              setAgregado(false);
+            }, 2000);
+          }}
+
         >
           🛒 Agregar al carrito
         </button>
+        {agregado && (
+          <p className={styles.addedMessage}>
+            ✅ Agregado al carrito
+          </p>
+        )}
       </div>
     </article>
   );

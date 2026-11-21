@@ -93,3 +93,10 @@
     min-height: auto;
   }
 }
+
+.addedMessage {
+  margin-top: 0.5rem;
+  color: #16a34a;
+  font-size: 0.85rem;
+  font-weight: 600;
+}

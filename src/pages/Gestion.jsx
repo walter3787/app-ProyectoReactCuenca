@@ -18,28 +18,48 @@ import styles from "./Gestion.module.css";
 export default function Gestion() {
   const { user } = useAuth();
 
-  const [productos, setProductos] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [productos, setProductos] =
+    useState([]);
 
-  const [productoAEditar, setProductoAEditar] =
-    useState(null);
+  const [loading, setLoading] =
+    useState(true);
+
+  const [
+    productoAEditar,
+    setProductoAEditar,
+  ] = useState(null);
+
+  const [
+    mostrarModal,
+    setMostrarModal,
+  ] = useState(false);
 
   const [busqueda, setBusqueda] =
     useState("");
 
-  const [categoriaFiltro, setCategoriaFiltro] =
-    useState("Todas");
+  const [
+    categoriaFiltro,
+    setCategoriaFiltro,
+  ] = useState("Todas");
 
-  const [ordenarPor, setOrdenarPor] =
+  const [filtroStock, setFiltroStock] =
+    useState("Todos");
+
+  const [ordenarPor,
+    setOrdenarPor] =
     useState("nombreAsc");
 
-  const [paginaActual, setPaginaActual] =
+  const [paginaActual,
+    setPaginaActual] =
     useState(1);
 
-  const [productosPorPagina,
-    setProductosPorPagina] = useState(10);
+  const [
+    productosPorPagina,
+    setProductosPorPagina,
+  ] = useState(10);
 
-  const [formulario, setFormulario] =
+  const [formulario,
+    setFormulario] =
     useState({
       nombre: "",
       precio: "",
@@ -53,35 +73,48 @@ export default function Gestion() {
     obtenerProductos();
   }, []);
 
-  const obtenerProductos = async () => {
-    try {
-      const productosRef =
-        collection(db, "productos");
+  const obtenerProductos =
+    async () => {
+      try {
+        const productosRef =
+          collection(
+            db,
+            "productos"
+          );
 
-      const respuesta =
-        await getDocs(productosRef);
+        const respuesta =
+          await getDocs(
+            productosRef
+          );
 
-      const productosFirestore =
-        respuesta.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const productosFirestore =
+          respuesta.docs.map(
+            (doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            })
+          );
 
-      setProductos(productosFirestore);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        setProductos(
+          productosFirestore
+        );
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const manejarCambio = (e) => {
+  const manejarCambio = (
+    e
+  ) => {
     setFormulario({
       ...formulario,
       [e.target.name]:
         e.target.value,
     });
   };
+
   const guardarProducto =
     async (e) => {
       e.preventDefault();
@@ -89,17 +122,20 @@ export default function Gestion() {
       if (
         formulario.nombre.trim() ===
         "" ||
-        Number(formulario.precio) <=
-        0
+        Number(
+          formulario.precio
+        ) <= 0
       ) {
         alert(
           "Nombre obligatorio y precio válido"
         );
+
         return;
       }
 
       const productoData = {
-        nombre: formulario.nombre,
+        nombre:
+          formulario.nombre,
         precio: Number(
           formulario.precio
         ),
@@ -115,7 +151,9 @@ export default function Gestion() {
       };
 
       try {
-        if (productoAEditar) {
+        if (
+          productoAEditar
+        ) {
           await updateDoc(
             doc(
               db,
@@ -143,7 +181,13 @@ export default function Gestion() {
           imagen: "",
         });
 
-        setProductoAEditar(null);
+        setProductoAEditar(
+          null
+        );
+
+        setMostrarModal(
+          false
+        );
 
         obtenerProductos();
       } catch (error) {
@@ -158,10 +202,15 @@ export default function Gestion() {
           "¿Eliminar producto?"
         );
 
-      if (!confirmar) return;
+      if (!confirmar)
+        return;
 
       await deleteDoc(
-        doc(db, "productos", id)
+        doc(
+          db,
+          "productos",
+          id
+        )
       );
 
       obtenerProductos();
@@ -170,23 +219,57 @@ export default function Gestion() {
   const editarProducto = (
     producto
   ) => {
-    setProductoAEditar(producto);
+    setProductoAEditar(
+      producto
+    );
 
     setFormulario({
       nombre:
-        producto.nombre || "",
+        producto.nombre ||
+        "",
       precio:
-        producto.precio || "",
+        producto.precio ||
+        "",
       stock:
-        producto.stock || "",
+        producto.stock ||
+        "",
       categoria:
-        producto.categoria || "",
+        producto.categoria ||
+        "",
       descripcion:
-        producto.descripcion || "",
+        producto.descripcion ||
+        "",
       imagen:
-        producto.imagen || "",
+        producto.imagen ||
+        "",
     });
+
+    setMostrarModal(
+      true
+    );
   };
+
+  const nuevoProducto =
+    () => {
+      setProductoAEditar(
+        null
+      );
+
+      setFormulario({
+        nombre: "",
+        precio: "",
+        stock: "",
+        categoria: "",
+        descripcion: "",
+        imagen: "",
+      });
+
+      setMostrarModal(
+        true
+      );
+    };
+
+
   let productosFiltrados =
     productos.filter(
       (producto) => {
@@ -198,14 +281,23 @@ export default function Gestion() {
             );
 
         const coincideCategoria =
-          categoriaFiltro ===
-          "Todas" ||
-          producto.categoria ===
-          categoriaFiltro;
+          categoriaFiltro === "Todas" ||
+          producto.categoria === categoriaFiltro;
+
+        const coincideStock =
+          filtroStock === "Todos" ||
+          (filtroStock === "Normal" &&
+            producto.stock > 10) ||
+          (filtroStock === "Bajo" &&
+            producto.stock > 5 &&
+            producto.stock <= 10) ||
+          (filtroStock === "Crítico" &&
+            producto.stock <= 5);
 
         return (
           coincideBusqueda &&
-          coincideCategoria
+          coincideCategoria &&
+          coincideStock
         );
       }
     );
@@ -224,16 +316,24 @@ export default function Gestion() {
           );
 
         case "precioAsc":
-          return a.precio - b.precio;
+          return (
+            a.precio - b.precio
+          );
 
         case "precioDesc":
-          return b.precio - a.precio;
+          return (
+            b.precio - a.precio
+          );
 
         case "stockAsc":
-          return a.stock - b.stock;
+          return (
+            a.stock - b.stock
+          );
 
         case "stockDesc":
-          return b.stock - a.stock;
+          return (
+            b.stock - a.stock
+          );
 
         default:
           return 0;
@@ -241,15 +341,14 @@ export default function Gestion() {
     }
   );
 
-  const categorias =
-    [
-      "Todas",
-      ...new Set(
-        productos.map(
-          (p) => p.categoria
-        )
-      ),
-    ];
+  const categorias = [
+    "Todas",
+    ...new Set(
+      productos.map(
+        (p) => p.categoria
+      )
+    ),
+  ];
 
   const indiceFinal =
     paginaActual *
@@ -271,150 +370,208 @@ export default function Gestion() {
       productosPorPagina
     );
 
-    const stockCritico = productos.filter(
-  (producto) => producto.stock <= 5
-).length;
+  const stockCritico =
+    productos.filter(
+      (producto) =>
+        producto.stock <= 5
+    ).length;
 
-const stockBajo = productos.filter(
-  (producto) =>
-    producto.stock > 5 &&
-    producto.stock <= 10
-).length;
+  const stockBajo =
+    productos.filter(
+      (producto) =>
+        producto.stock > 5 &&
+        producto.stock <= 10
+    ).length;
 
-const stockNormal = productos.filter(
-  (producto) => producto.stock > 10
-).length;
+  const stockNormal =
+    productos.filter(
+      (producto) =>
+        producto.stock > 10
+    ).length;
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>
         Panel de Gestión
       </h1>
 
-<div className={styles.stockSummary}>
-  <div className={styles.stockCardGreen}>
-    <span>🟢</span>
-    <div>
-      <strong>{stockNormal}</strong>
-      <p>Stock normal</p>
-    </div>
-  </div>
+      <p className={styles.userInfo}>
+        Usuario: {user?.email}
+      </p>
 
-  <div className={styles.stockCardYellow}>
-    <span>🟡</span>
-    <div>
-      <strong>{stockBajo}</strong>
-      <p>Stock bajo</p>
-    </div>
-  </div>
-
-  <div className={styles.stockCardRed}>
-    <span>🔴</span>
-    <div>
-      <strong>{stockCritico}</strong>
-      <p>Stock crítico</p>
-    </div>
-  </div>
-
-  <div className={styles.stockCardBlue}>
-    <span>📦</span>
-    <div>
-      <strong>{productos.length}</strong>
-      <p>Total productos</p>
-    </div>
-  </div>
-</div>
-
-      <div className={styles.formCard}>
-        <h2>
-          {productoAEditar
-            ? "Editar producto"
-            : "Alta de producto"}
-        </h2>
-
-        <form
-          onSubmit={guardarProducto}
-          className={styles.form}
+      <div className={styles.stockSummary}>
+        <div
+          className={styles.stockCardGreen}
+          onClick={() => {
+            setFiltroStock("Normal");
+            setPaginaActual(1);
+          }}
         >
-          <input
-            type="text"
-            name="nombre"
-            placeholder="Nombre"
-            value={formulario.nombre}
-            onChange={manejarCambio}
-          />
+          <div className={styles.stockCircle}></div>
 
-          <input
-            type="number"
-            name="precio"
-            placeholder="Precio"
-            value={formulario.precio}
-            onChange={manejarCambio}
-          />
+          <span>Stock normal</span>
 
-          <input
-            type="number"
-            name="stock"
-            placeholder="Stock"
-            value={formulario.stock}
-            onChange={manejarCambio}
-          />
+          <strong>{stockNormal}</strong>
+        </div>
 
-          <input
-            type="text"
-            name="categoria"
-            placeholder="Categoría"
-            value={formulario.categoria}
-            onChange={manejarCambio}
-          />
-
-          <input
-            type="text"
-            name="imagen"
-            placeholder="URL imagen"
-            value={formulario.imagen}
-            onChange={manejarCambio}
-          />
-
-          <textarea
-            name="descripcion"
-            placeholder="Descripción"
-            value={formulario.descripcion}
-            onChange={manejarCambio}
-          />
-
+        <div
+          className={styles.stockCardYellow}
+          onClick={() => {
+            setFiltroStock("Bajo");
+            setPaginaActual(1);
+          }}
+        >
           <div
-            className={styles.formActions}
-          >
-            <button type="submit">
-              {productoAEditar
-                ? "Actualizar"
-                : "Guardar"}
-            </button>
+            className={`${styles.stockCircle} ${styles.yellowCircle}`}
+          ></div>
 
-            {productoAEditar && (
-              <button
-                type="button"
-                onClick={() => {
-                  setProductoAEditar(
-                    null
-                  );
+          <span>Stock bajo</span>
 
-                  setFormulario({
-                    nombre: "",
-                    precio: "",
-                    stock: "",
-                    categoria: "",
-                    descripcion: "",
-                    imagen: "",
-                  });
-                }}
-              >
-                Cancelar
-              </button>
-            )}
-          </div>
-        </form>
+          <strong>{stockBajo}</strong>
+        </div>
+
+
+        <div
+          className={styles.stockCardRed}
+          onClick={() => {
+            setFiltroStock("Crítico");
+            setPaginaActual(1);
+          }}
+        >
+          <div
+            className={`${styles.stockCircle} ${styles.redCircle}`}
+          ></div>
+
+          <span>Stock crítico</span>
+
+          <strong>{stockCritico}</strong>
+        </div>
+
+        <div
+          className={styles.stockCardBlue}
+          onClick={() => {
+            setFiltroStock("Todos");
+            setPaginaActual(1);
+          }}
+        >
+          <div
+            className={`${styles.stockCircle} ${styles.blueCircle}`}
+          ></div>
+
+          <span>Todos los productos</span>
+
+          <strong>{productos.length}</strong>
+        </div>
       </div>
+
+      <p className={styles.dashboardHint}>
+        💡 Hacé clic en una tarjeta para filtrar productos por estado de stock.
+      </p>
+
+      <p className={styles.activeFilter}>
+        Filtro actual:
+        {" "}
+        <strong>{filtroStock}</strong>
+      </p>
+
+      <button
+        className={styles.newProductButton}
+        onClick={nuevoProducto}
+      >
+        ➕ Nuevo Producto
+      </button>
+
+      {mostrarModal && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() =>
+            setMostrarModal(false)
+          }
+        >
+          <div
+            className={styles.modal}
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+          >
+            <div className={styles.modalHeader}>
+              <h2>
+                {productoAEditar
+                  ? "Editar producto"
+                  : "Nuevo producto"}
+              </h2>
+
+              <button
+                className={styles.closeButton}
+                onClick={() =>
+                  setMostrarModal(false)
+                }
+              >
+                ✕
+              </button>
+            </div>
+
+            <form
+              onSubmit={guardarProducto}
+              className={styles.form}
+            >
+              <input
+                type="text"
+                name="nombre"
+                placeholder="Nombre"
+                value={formulario.nombre}
+                onChange={manejarCambio}
+              />
+
+              <input
+                type="number"
+                name="precio"
+                placeholder="Precio"
+                value={formulario.precio}
+                onChange={manejarCambio}
+              />
+
+              <input
+                type="number"
+                name="stock"
+                placeholder="Stock"
+                value={formulario.stock}
+                onChange={manejarCambio}
+              />
+
+              <input
+                type="text"
+                name="categoria"
+                placeholder="Categoría"
+                value={formulario.categoria}
+                onChange={manejarCambio}
+              />
+
+              <input
+                type="text"
+                name="imagen"
+                placeholder="URL imagen"
+                value={formulario.imagen}
+                onChange={manejarCambio}
+              />
+
+              <textarea
+                name="descripcion"
+                placeholder="Descripción"
+                value={formulario.descripcion}
+                onChange={manejarCambio}
+              />
+
+              <div className={styles.formActions}>
+                <button type="submit">
+                  {productoAEditar
+                    ? "Actualizar Producto"
+                    : "Guardar Producto"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <div className={styles.filters}>
         <input
@@ -422,10 +579,7 @@ const stockNormal = productos.filter(
           placeholder="Buscar producto..."
           value={busqueda}
           onChange={(e) => {
-            setBusqueda(
-              e.target.value
-            );
-
+            setBusqueda(e.target.value);
             setPaginaActual(1);
           }}
         />
@@ -436,28 +590,23 @@ const stockNormal = productos.filter(
             setCategoriaFiltro(
               e.target.value
             );
-
             setPaginaActual(1);
           }}
         >
-          {categorias.map(
-            (categoria) => (
-              <option
-                key={categoria}
-                value={categoria}
-              >
-                {categoria}
-              </option>
-            )
-          )}
+          {categorias.map((categoria) => (
+            <option
+              key={categoria}
+              value={categoria}
+            >
+              {categoria}
+            </option>
+          ))}
         </select>
 
         <select
           value={ordenarPor}
           onChange={(e) =>
-            setOrdenarPor(
-              e.target.value
-            )
+            setOrdenarPor(e.target.value)
           }
         >
           <option value="nombreAsc">
@@ -486,14 +635,10 @@ const stockNormal = productos.filter(
         </select>
 
         <select
-          value={
-            productosPorPagina
-          }
+          value={productosPorPagina}
           onChange={(e) => {
             setProductosPorPagina(
-              Number(
-                e.target.value
-              )
+              Number(e.target.value)
             );
 
             setPaginaActual(1);
@@ -518,19 +663,11 @@ const stockNormal = productos.filter(
       </div>
 
       {loading ? (
-        <p>Cargando...</p>
+        <p>Cargando productos...</p>
       ) : (
         <>
-          <div
-            className={
-              styles.tableWrapper
-            }
-          >
-            <table
-              className={
-                styles.table
-              }
-            >
+          <div className={styles.tableWrapper}>
+            <table className={styles.table}>
               <thead>
                 <tr>
                   <th>Img</th>
@@ -545,19 +682,11 @@ const stockNormal = productos.filter(
 
               <tbody>
                 {productosPagina.map(
-                  (
-                    producto
-                  ) => (
-                    <tr
-                      key={
-                        producto.id
-                      }
-                    >
+                  (producto) => (
+                    <tr key={producto.id}>
                       <td>
                         <img
-                          src={
-                            producto.imagen
-                          }
+                          src={producto.imagen}
                           alt={
                             producto.nombre
                           }
@@ -568,9 +697,7 @@ const stockNormal = productos.filter(
                       </td>
 
                       <td>
-                        {
-                          producto.nombre
-                        }
+                        {producto.nombre}
                       </td>
 
                       <td>
@@ -587,9 +714,7 @@ const stockNormal = productos.filter(
                       </td>
 
                       <td>
-                        {
-                          producto.stock
-                        }
+                        {producto.stock}
                       </td>
 
                       <td>
@@ -650,22 +775,12 @@ const stockNormal = productos.filter(
             </table>
           </div>
 
-          <div
-            className={
-              styles.pagination
-            }
-          >
+          <div className={styles.pagination}>
             <button
-              disabled={
-                paginaActual ===
-                1
-              }
+              disabled={paginaActual === 1}
               onClick={() =>
                 setPaginaActual(
-                  (
-                    prev
-                  ) =>
-                    prev - 1
+                  (prev) => prev - 1
                 )
               }
             >
@@ -673,8 +788,7 @@ const stockNormal = productos.filter(
             </button>
 
             <span>
-              Página{" "}
-              {paginaActual} de{" "}
+              Página {paginaActual} de{" "}
               {totalPaginas}
             </span>
 
@@ -685,10 +799,7 @@ const stockNormal = productos.filter(
               }
               onClick={() =>
                 setPaginaActual(
-                  (
-                    prev
-                  ) =>
-                    prev + 1
+                  (prev) => prev + 1
                 )
               }
             >
