@@ -1,61 +1,105 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { Helmet } from "react-helmet-async";
+
 import { useAuth } from "../context/AuthContext";
 
+import styles from "./Registro.module.css";
+
 export default function Registro() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
+
+  const [error, setError] =
+    useState("");
 
   const { signup } = useAuth();
-  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+  const navigate =
+    useNavigate();
 
-    try {
-      await signup(email, password);
-      navigate("/");
-    } catch (err) {
-      setError(err.message);
-      console.error(err);
-    }
-  };
+  const handleSubmit =
+    async (e) => {
+      e.preventDefault();
+
+      setError("");
+
+      try {
+        await signup(
+          email,
+          password
+        );
+
+        navigate("/");
+      } catch (err) {
+        setError(err.message);
+
+        console.error(err);
+      }
+    };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "2rem auto" }}>
-      <h2>Crear cuenta</h2>
+    <>
+      <Helmet>
+        <title>
+          SMDStore | Registro
+        </title>
+      </Helmet>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <h2 className={styles.title}>
+            Crear cuenta
+          </h2>
 
-        <br /><br />
+          <form
+            onSubmit={handleSubmit}
+            className={styles.form}
+          >
+            <input
+              type="email"
+              placeholder="Correo electrónico"
+              value={email}
+              onChange={(e) =>
+                setEmail(
+                  e.target.value
+                )
+              }
+            />
 
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+            <input
+              type="password"
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) =>
+                setPassword(
+                  e.target.value
+                )
+              }
+            />
 
-        <br /><br />
+            <button
+              type="submit"
+            >
+              Registrarse
+            </button>
+          </form>
 
-        <button type="submit">
-          Registrarse
-        </button>
-      </form>
-
-      {error && (
-        <p style={{ color: "red" }}>
-          {error}
-        </p>
-      )}
-    </div>
+          {error && (
+            <p
+              className={
+                styles.error
+              }
+            >
+              {error}
+            </p>
+          )}
+        </div>
+      </div>
+    </>
   );
 }

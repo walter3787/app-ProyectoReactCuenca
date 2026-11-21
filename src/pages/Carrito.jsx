@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { useCart } from "../context/CartContext";
+
 
 import styles from "./Carrito.module.css";
 
@@ -16,25 +18,33 @@ export default function Carrito() {
 
   if (cart.length === 0) {
     return (
+    <><Helmet>
+        <title>SMDStore | Carrito</title>
+      </Helmet>
       <div className={styles.emptyCart}>
-        <h2>🛒 Tu Carrito de Compras</h2>
+          <h2>🛒 Tu Carrito de Compras</h2>
 
-        <p className={styles.emptyText}>
-          No hay productos en el carrito.
-        </p>
+          <p className={styles.emptyText}>
+            No hay productos en el carrito.
+          </p>
 
-        <Link
-          to="/productos"
-          className={styles.shopButton}
-        >
-          Explorar Productos
-        </Link>
-      </div>
+          <Link
+            to="/productos"
+            className={styles.shopButton}
+          >
+            Explorar Productos
+          </Link>
+        </div></>
     );
   }
 
-  return (
+return (
+    <><Helmet>
+      <title>SMDStore | Carrito</title>
+    </Helmet>
+
     <div className={styles.container}>
+
       <h1 className={styles.title}>
         🛒 Carrito de Compras
       </h1>
@@ -181,5 +191,6 @@ export default function Carrito() {
         </div>
       </div>
     </div>
+    </>
   );
 }

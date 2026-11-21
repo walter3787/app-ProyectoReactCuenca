@@ -10,6 +10,7 @@ import Registro from './pages/Registro';
 import Gestion from './pages/Gestion';
 import ProtectedRoute from './components/ProtectedRoute';
 import CargaProductos from "./pages/CargaProductos";
+import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
@@ -56,11 +57,7 @@ export default function App() {
         {/* Ruta comodín por si escriben cualquier otra dirección */}
         <Route
           path="*"
-          element={
-            <div style={{ textAlign: 'center', padding: '3rem' }}>
-              <h2>404 - Página no encontrada</h2>
-            </div>
-          }
+          element={<NotFound />}
         />
       </Route>
     </Routes>

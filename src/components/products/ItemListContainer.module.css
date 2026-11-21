@@ -1,0 +1,59 @@
+.centerMessage {
+  text-align: center;
+  padding: 3rem;
+}
+
+.title {
+  color: #0f172a;
+  margin-bottom: 1rem;
+  font-size: 1.75rem;
+}
+
+.searchInput {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+
+  font-size: 1rem;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  gap: 0.5rem;
+
+  margin-top: 2rem;
+}
+
+.pageButton {
+  padding: 0.5rem 1rem;
+
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+
+  background: white;
+
+  cursor: pointer;
+}
+
+.pageButton:hover {
+  background: #f8fafc;
+}
+
+.activePage {
+  padding: 0.5rem 1rem;
+
+  border-radius: 6px;
+  border: 1px solid #0d9488;
+
+  background: #0d9488;
+  color: white;
+
+  cursor: pointer;
+}

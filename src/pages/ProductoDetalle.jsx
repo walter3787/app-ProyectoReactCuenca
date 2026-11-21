@@ -1,59 +1,119 @@
-import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import React, {
+  useEffect,
+  useState,
+} from "react";
 
-import { doc, getDoc } from "firebase/firestore";
+import {
+  Link,
+  useParams,
+} from "react-router-dom";
+
+import { Helmet } from "react-helmet-async";
+
+import {
+  doc,
+  getDoc,
+} from "firebase/firestore";
+
 import { db } from "../firebase/config";
 
 import { useCart } from "../context/CartContext";
 
+import styles from "./ProductoDetalle.module.css";
+
 export default function ProductoDetalle() {
   const { id } = useParams();
 
-  const [producto, setProducto] = useState(null);
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState(null);
+  const [producto, setProducto] =
+    useState(null);
+
+  const [cargando, setCargando] =
+    useState(true);
+
+  const [error, setError] =
+    useState(null);
 
   const { addToCart } = useCart();
 
   useEffect(() => {
-    const obtenerProducto = async () => {
-      try {
-        const productoRef = doc(db, "productos", id);
+    const obtenerProducto =
+      async () => {
+        try {
+          const productoRef =
+            doc(
+              db,
+              "productos",
+              id
+            );
 
-        const respuesta = await getDoc(productoRef);
+          const respuesta =
+            await getDoc(
+              productoRef
+            );
 
-        if (!respuesta.exists()) {
-          throw new Error("Producto no encontrado");
+          if (
+            !respuesta.exists()
+          ) {
+            throw new Error(
+              "Producto no encontrado"
+            );
+          }
+
+          setProducto({
+            id: respuesta.id,
+            ...respuesta.data(),
+          });
+        } catch (err) {
+          setError(
+            err.message
+          );
+        } finally {
+          setCargando(false);
         }
-
-        setProducto({
-          id: respuesta.id,
-          ...respuesta.data(),
-        });
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setCargando(false);
-      }
-    };
+      };
 
     obtenerProducto();
   }, [id]);
 
   if (cargando) {
     return (
-      <div style={{ textAlign: "center", padding: "3rem" }}>
-        <h2>Cargando detalle del producto... ⏳</h2>
+      <div
+        className={
+          styles.centerMessage
+        }
+      >
+        <h2>
+          Cargando detalle del
+          producto... ⏳
+        </h2>
       </div>
     );
   }
 
   if (error || !producto) {
     return (
-      <div style={{ textAlign: "center", padding: "3rem" }}>
-        <h2>{error || "Producto no encontrado"}</h2>
+      <div
+        className={
+          styles.centerMessage
+        }
+      >
+        <Helmet>
+          <title>
+            SMDStore | Producto no encontrado
+          </title>
+        </Helmet>
 
-        <Link to="/productos">
+        <h2>
+          {error ||
+            "Producto no encontrado"}
+        </h2>
+
+        <Link
+          to="/productos"
+          className={
+            styles.backLink
+          }
+        >
           ← Volver al catálogo
         </Link>
       </div>
@@ -61,54 +121,108 @@ export default function ProductoDetalle() {
   }
 
   return (
-    <div>
-      <Link to="/productos">
-        ← Volver al catálogo
-      </Link>
+    <>
+      <Helmet>
+        <title>
+          SMDStore | {producto.nombre}
+        </title>
 
-      <article
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "2rem",
-          maxWidth: "900px",
-          margin: "2rem auto",
-        }}
-      >
-        <div style={{ flex: 1 }}>
-          <img
-            src={producto.imagen}
-            alt={producto.nombre}
-            style={{
-              width: "100%",
-              maxHeight: "320px",
-              objectFit: "contain",
-            }}
-          />
-        </div>
+        <meta
+          name="description"
+          content={
+            producto.descripcion
+          }
+        />
+      </Helmet>
 
-        <div style={{ flex: 1 }}>
-          <h2>{producto.nombre}</h2>
+      <div>
+        <Link
+          to="/productos"
+          className={
+            styles.backLink
+          }
+        >
+          ← Volver al catálogo
+        </Link>
 
-          <p>{producto.descripcion}</p>
-
-          <p>
-            <strong>
-              ${producto.precio.toLocaleString("es-AR")}
-            </strong>
-          </p>
-
-          <p>
-            Stock disponible: {producto.stock}
-          </p>
-
-          <button
-            onClick={() => addToCart(producto)}
+        <article
+          className={
+            styles.container
+          }
+        >
+          <div
+            className={
+              styles.imageContainer
+            }
           >
-            Agregar al carrito
-          </button>
-        </div>
-      </article>
-    </div>
+            <img
+              src={
+                producto.imagen
+              }
+              alt={
+                producto.nombre
+              }
+              className={
+                styles.image
+              }
+            />
+          </div>
+
+          <div
+            className={
+              styles.content
+            }
+          >
+            <h2>
+              {producto.nombre}
+            </h2>
+
+            <p
+              className={
+                styles.description
+              }
+            >
+              {
+                producto.descripcion
+              }
+            </p>
+
+            <p
+              className={
+                styles.price
+              }
+            >
+              $
+              {producto.precio.toLocaleString(
+                "es-AR"
+              )}
+            </p>
+
+            <p
+              className={
+                styles.stock
+              }
+            >
+              Stock disponible:
+              {" "}
+              {producto.stock}
+            </p>
+
+            <button
+              className={
+                styles.cartButton
+              }
+              onClick={() =>
+                addToCart(
+                  producto
+                )
+              }
+            >
+              🛒 Agregar al carrito
+            </button>
+          </div>
+        </article>
+      </div>
+    </>
   );
 }

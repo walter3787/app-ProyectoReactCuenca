@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import { Helmet } from "react-helmet-async";
 import { useAuth } from "../context/AuthContext";
 
 import {
@@ -388,7 +388,14 @@ export default function Gestion() {
       (producto) =>
         producto.stock > 10
     ).length;
-  return (
+return (
+  <>
+    <Helmet>
+      <title>
+        SMDStore | Gestión
+      </title>
+    </Helmet>
+
     <div className={styles.container}>
       <h1 className={styles.title}>
         Panel de Gestión
@@ -809,5 +816,6 @@ export default function Gestion() {
         </>
       )}
     </div>
+  </>
   );
 }
